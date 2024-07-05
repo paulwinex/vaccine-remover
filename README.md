@@ -31,3 +31,14 @@ Backup original files and rename cleared to original name
 python vaccine_remover.py [path] -r -b
 ```
 
+Multi path
+
+```shell
+python vaccine_remover.py [path1] [path2] [path3] -r
+```
+
+Single file
+
+```shell
+python vaccine_remover.py mayafile.ma
+```
