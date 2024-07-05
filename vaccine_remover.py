@@ -65,7 +65,7 @@ def replace_file(old_file, new_file, backup=True):
     shutil.copyfile(new_file, old_file)
 
 
-def clear_ma_files(src_dir, tmp_dir=None, recursive=True, replace_old_file=False):
+def clear_ma_files(src_dir, tmp_dir=None, recursive=True, replace_old_file=False, make_backup=True):
     """
     Recursive search and removal of malware from ma files in the specified directory
     """
@@ -84,7 +84,7 @@ def clear_ma_files(src_dir, tmp_dir=None, recursive=True, replace_old_file=False
         if clean_file:
             if replace_old_file:
                 logging.info('Replace old file...')
-                replace_file(orig_file, clean_file)
+                replace_file(orig_file, clean_file, backup=make_backup)
                 cleaned_files.append(orig_file)
             else:
                 new_name = orig_file.with_name(orig_file.name+'.clean')
@@ -103,15 +103,20 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('paths', nargs='+', default='.', help='Path to folder or file')
-    parser.add_argument('-r', '--replace',  action='store_true', help='Replace old file')
-    parser.add_argument('-b', '--backup',  action='store_true', help='Create backup for old file')
+    parser.add_argument('-r', '--replace',  action='store_true', default=False, help='Replace old file')
+    parser.add_argument('-b', '--backup',  action='store_true', default=False, help='Create backup for old file')
     args = parser.parse_args()
     if args.paths:
         for path in args.paths:
             path = Path(path).resolve()
             if path.exists():
                 if path.is_dir():
-                    cleared_files = clear_ma_files(path, recursive=True)
+                    cleared_files = clear_ma_files(
+                        path,
+                        recursive=True,
+                        replace_old_file=args.replace,
+                        make_backup=args.backup
+                    )
                     for file in cleared_files:
                         print(file)
                 elif path.is_file() and path.suffix == '.ma':
